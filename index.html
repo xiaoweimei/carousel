@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+	<link rel="stylesheet" href="http://at.alicdn.com/t/font_1057491_q1lnyca2ivp.css">
+	<title>Carousel</title>
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		li{
+			list-style-type: none;
+		}
+		.carousel{
+			position: relative;
+			padding-top: 100px;
+			width: 320px;
+			height: 180px;
+			margin: 0 auto;
+			overflow: hidden;
+		}
+		.img_contain{
+			position: absolute;
+		}
+		.img_contain:after{
+			content: '';
+			display: block;
+			clear: both;
+		}
+		img{
+			float: left;
+			width: 320px;
+			height: 180px;
+		}
+		.img_index{
+			position: absolute;
+			width: 320px;
+			top: 255px;
+			text-align: center;
+		}
+		.img_index>li{
+			display: inline-block;
+			border: 1px solid #dedede;
+			width: 30px;
+			height: 8px;
+			border-radius: 4px;
+			cursor: pointer;
+			margin:0 15px;
+		}
+		.iconfont{
+			font-size: 30px;
+			position: absolute;
+			color: #ededed;
+			cursor: pointer;
+		}
+		.iconfont:hover{
+			color: #999;
+		}
+		.icon-pre{
+			top:175px;
+			left: 2px;
+		}
+		.icon-next{
+			top: 175px;
+			left: 288px;
+		}
+		.active{
+			background-color: #999;
+		}
+	</style>
+</head>
+<body>
+	<div class="carousel">
+		<ul class='img_contain'>
+			<li class="active"><img src="1.png" alt=""></li>
+			<li><img src="2.jpg" alt=""></li>
+			<li><img src="3.jpg" alt=""></li>
+			<li><img src="4.jpg" alt=""></li>
+		</ul>
+		<div class='pre_next'>
+			<span class='iconfont icon-pre'></span>
+			<span class='iconfont icon-next'></span>
+		</div>
+		<ul class='img_index'>
+			<li class="active"></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+	<div class="carousel">
+		<ul class='img_contain'>
+			<li class="active"><img src="5.png" alt=""></li>
+			<li><img src="6.png" alt=""></li>
+			<li><img src="7.jpg" alt=""></li>
+			<li><img src="8.jpg" alt=""></li>
+		</ul>
+		<div class='pre_next'>
+			<span class='iconfont icon-pre'></span>
+			<span class='iconfont icon-next'></span>
+		</div>
+		<ul class='img_index'>
+			<li class="active"></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+	<div class="carousel">
+		<ul class='img_contain'>
+			<li class="active"><img src="9.jpg" alt=""></li>
+			<li><img src="10.jpg" alt=""></li>
+			<li><img src="11.jpg" alt=""></li>
+			<li><img src="12.jpg" alt=""></li>
+		</ul>
+		<div class='pre_next'>
+			<span class='iconfont icon-pre'></span>
+			<span class='iconfont icon-next'></span>
+		</div>
+		<ul class='img_index'>
+			<li class="active"></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+		<script>
+			function Carousel($ct){
+				this.init($ct)
+				this.bind()
+			}
+			Carousel.prototype = {
+				constructor: Carousel,
+				init: function($ct){
+					console.log(this)
+					this.$ct=$ct
+					this.$imgct=this.$ct.find('.img_contain')
+					this.$imgs=this.$ct.find('.img_contain>li')
+					this.$prebtn=this.$ct.find('.icon-pre')
+					this.$nextbtn=this.$ct.find('.icon-next')
+					this.$bullets=this.$ct.find('.img_index>li')
+
+					this.imgWidth=this.$imgs.width()
+					console.log(this.imgWidth)
+					this.imgCount=this.$imgs.length
+					this.index=0
+					this.isAnimate=false
+
+					this.$imgct.append(this.$imgs.first().clone())
+					this.$imgct.prepend(this.$imgs.last().clone())
+					this.$imgct.width((this.imgCount+2)*(this.imgWidth))
+					console.log(this.$imgct.width())
+					this.$imgct.css('left',-this.imgWidth)
+				},
+				bind: function(){
+					var _this = this
+					this.$prebtn.on('click',function(){
+						console.log('pre...')
+						_this.playPre(1)
+					})
+					this.$nextbtn.on('click',function(){
+						console.log('next...')
+						_this.playNext(1)
+					})
+					this.$bullets.on('click',function(){
+						var index = $(this).index()
+						if(_this.index>index){
+							_this.playPre(_this.index - index)
+						}
+						else{_this.playNext(index - _this.index)}
+					})
+				},
+				playNext: function(len){
+					console.log('playNext...')
+					if(this.isAnimate) return
+					this.isAnimate = true
+					var _this = this
+					this.$imgct.animate({left:'-='+this.imgWidth*len},function(){
+						_this.index +=len
+						if(_this.index ===_this.imgCount){
+							_this.$imgct.css('left',-_this.imgWidth)
+							_this.index =0
+						}
+						_this.setbullet()
+						_this.isAnimate = false
+					})
+				},
+				playPre: function(len){
+					console.log('playPre...')
+					if(this.isAnimate) return
+					this.isAnimate = true
+					var _this = this
+					this.$imgct.animate({left:'+='+this.imgWidth*len},function(){
+						_this.index -=len
+						if(_this.index ===_this.imgCount){
+							_this.$imgct.css('left',-_this.imgWidth)
+							_this.index = _this.imgCount -1
+						}
+						_this.setbullet()
+						_this.isAnimate = false
+					})
+				},				
+				setbullet: function(){
+					this.$bullets.eq(this.index).addClass('active')
+							.siblings().removeClass('active')
+				},
+
+				autoPlay: function(){
+					var _this = this
+					this.autoClock = setInterval(function(){
+						_this.playNext(1)
+					}, 1000)
+				},
+
+				stopAuto: function(){
+					clearInterval(this.autoClock)
+				}
+			}
+			var a = new Carousel($('.carousel').eq(0))
+			var b = new Carousel($('.carousel').eq(1))
+			var c = new Carousel($('.carousel').eq(2))
+		</script>
+</body>
+</html>
